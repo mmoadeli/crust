@@ -148,6 +148,7 @@ impl ConnectionManager {
     /// It will return Err if it fails to connect to any peer.
     pub fn bootstrap(&self, bootstrap_list: Option<Vec<Endpoint>>, beacon_port: Option<u16>) ->
             io::Result<Endpoint> {
+        println!("bootstrapbootstrapbootstrap");
         let port: u16 = match beacon_port {
             Some(udp_port) => udp_port,
             None => 5483
@@ -405,11 +406,13 @@ fn start_reading_thread(state: WeakState,
         loop {
             match receiver.receive() {
                 Ok(msg) => if sink.send(Event::NewMessage(his_ep.clone(), msg)).is_err() {
+                    println!("start_reading_thread1");
                     break
                 },
-                Err(_) => break
+                Err(_) => { println!("start_reading_thread2"); break }
             }
         }
+        println!("start_reading_thread3");
         unregister_connection(state, his_ep);
     });
 }
@@ -422,9 +425,11 @@ fn start_writing_thread(state: WeakState,
     let _ = thread::spawn(move || {
         for msg in writer_channel.iter() {
             if sender.send(&msg).is_err() {
+                println!("start_writing_thread1");
                 break;
             }
         }
+        println!("start_writing_thread2");
         unregister_connection(state, his_ep);
     });
 }
